@@ -16,7 +16,7 @@ function RedisEvent(redisClient, channelsList) {
 
 	this.channelsList = channelsList;
 
-	this.pubRedis = redisClient;
+	this.pubRedis = redisClient.pub;
 	this.pubRedis.on('error', function (e) {
 		console.log(e);
 	});
@@ -30,7 +30,7 @@ function RedisEvent(redisClient, channelsList) {
 		self._connectedCount--;
 	});
 
-	this.subRedis = redisClient;
+	this.subRedis = redisClient.sub;
 	this.subRedis.on('error', function (e) {
 		console.log(e);
 	});
