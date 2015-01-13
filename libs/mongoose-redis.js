@@ -155,7 +155,7 @@ function mongooseRedis(schema, options) {
 			model.jobs = kue.createQueue({
 				redis: {
 					createClientFactory: function () {
-						return redisClient.kue;
+						return redisClientKue;
 					}
 				}
 			});
