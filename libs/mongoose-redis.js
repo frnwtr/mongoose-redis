@@ -147,7 +147,9 @@ function mongooseRedis(schema, options) {
 				});*/
 			model.jobs = kue.createQueue({
 				redis: {
-					createClientFactory: redisClient
+					createClientFactory: function () {
+						return redisClient;
+					}
 				}
 			});
 			model.jobs.on('job enqueue', function (id, type) {
