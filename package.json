@@ -1,0 +1,35 @@
+{
+  "name": "mongoose-redis",
+  "version": "0.0.1",
+  "description": "mongoose to redis event an queue emiter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frnwtr/mongoose-redis"
+  },
+  "keywords": [
+    "mongoose",
+    "redis",
+    "kue",
+    "event",
+    "emit"
+  ],
+  "author": "Walter Franchetti <walter.franchetti@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frnwtr/mongoose-redis/issues"
+  },
+  "homepage": "https://github.com/frnwtr/mongoose-redis",
+  "dependencies": {
+    "async": "^0.9.0",
+    "hiredis": "^0.1.17",
+    "kue": "^0.8.11",
+    "mongoose": "^3.8.21",
+    "redis": "^0.12.1",
+    "underscore": "^1.7.0",
+    "winston": "^0.8.3"
+  }
+}
