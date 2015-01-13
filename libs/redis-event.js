@@ -14,12 +14,6 @@ function RedisEvent(redisClient, channelsList) {
 		var channelsList = [];
 	}
 
-
-	if (!host) {
-		throw new Error("No hostname specified to RedisEvent");
-		return;
-	}
-
 	this.channelsList = channelsList;
 
 	this.pubRedis = redisClient;
