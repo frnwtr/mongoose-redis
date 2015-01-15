@@ -153,10 +153,7 @@ function mongooseRedis(schema, options) {
 					model.emit("stats:queue", data);
 				});*/
 			model.jobs = kue.createQueue(redisClientKue);
-
-			model.jobs.on('job enqueue', function (id, type) {
-				console.log('job %s got queued', id);
-			});
+			
 			model.queueStats = function (cb) {
 				get(model.jobs)
 					('inactiveCount')
