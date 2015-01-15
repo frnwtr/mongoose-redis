@@ -202,19 +202,19 @@ function mongooseRedis(schema, options) {
 			newRecords.splice(indexNew, 1);
 			ev.pub(prefix+"create:" + channel, doc);
 			if (queue.create) {
-				newJob(model.jobs, "create", channel, doc, function (err, job) {});
+				newJob(model.jobs, prefix,"create", channel, doc, function (err, job) {});
 			}
 		} else {
 			ev.pub(prefix+"update:" + channel, doc);
 			if (queue.update) {
-				newJob(model.jobs, "update", channel, doc, function (err, job) {});
+				newJob(model.jobs, prefix, "update", channel, doc, function (err, job) {});
 			}
 		}
 	});
 	schema.post('remove', function (doc) {
 		ev.pub(prefix+"remove:" + channel, doc);
 		if (queue.remove) {
-			newJob(model.jobs, "remove", channel, doc, function (err, job) {});
+			newJob(model.jobs, prefix,"remove", channel, doc, function (err, job) {});
 		}
 	});
 
