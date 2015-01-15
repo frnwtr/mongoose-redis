@@ -34,7 +34,7 @@ function get(obj) {
 	};
 }
 
-function newJob(jobs, action, chan, doc, cb) {
+function newJob(jobs,prefix, action, chan, doc, cb) {
 	var channel = action + chan;
 	var evCont = doc.toObject();
 
@@ -43,21 +43,21 @@ function newJob(jobs, action, chan, doc, cb) {
 		evCont.status = "completed";
 		evCont.progress = 100;
 		evCont.job = job.id;
-		ev.pub("queue:" + channel, evCont);
+		ev.pub(prefix+"queue:" + channel, evCont);
 	}).on('failed', function () {
 		evCont.status = "failed";
 		evCont.job = job.id;
-		ev.pub("queue:" + channel, evCont);
+		ev.pub(prefix+"queue:" + channel, evCont);
 	}).on('progress', function (progress) {
 		evCont.status = "progress";
 		evCont.job = job.id;
 		evCont.progress = progress;
-		ev.pub("queue:" + channel, evCont);
+		ev.pub(prefix+"queue:" + channel, evCont);
 	}).on('enqueue', function () {
 		evCont.status = "enqueue";
 		evCont.job = job.id;
 		evCont.progress = 0;
-		ev.pub("queue:" + channel, evCont);
+		ev.pub(prefix+"queue:" + channel, evCont);
 	});
 	job.removeOnComplete(true).save(function (err) {
 		get(jobs)
@@ -73,7 +73,7 @@ function newJob(jobs, action, chan, doc, cb) {
 						error: err.message
 					});
 				} else {
-					ev.pub("stats:queue", obj);
+					ev.pub(prefix+"stats:queue", obj);
 				}
 			});
 		cb(err, job);
@@ -83,10 +83,12 @@ function newJob(jobs, action, chan, doc, cb) {
 function mongooseRedis(schema, options) {
 	events.EventEmitter.call(this);
 	var redisClientKue=null;
+	var prefix="q:";
 	if (options.redisClient) {
 		var redisClientPub = options.redisClient.pub;
 		var redisClientSub = options.redisClient.sub;
 		redisClientKue = options.redisClient.kue;
+		prefix=options.redisClient.kue.prefix+":";
 	} else {
 		var redisClientPub = redis.createClient('localhost', 6379);
 		var redisClientSub = redis.createClient('localhost', 6379);
@@ -125,27 +127,27 @@ function mongooseRedis(schema, options) {
 		model = this.model(this.constructor.modelName);
 		if (!channel) {
 			channel = this.constructor.modelName;
-			ev.on("create:" + channel, function (data) {
+			ev.on(prefix+"create:" + channel, function (data) {
 				model.emit("created", data);
 			});
 
-			ev.on("update:" + channel, function (data) {
+			ev.on(prefix+"update:" + channel, function (data) {
 				model.emit("updated", data);
 			});
 
-			ev.on("remove:" + channel, function (data) {
+			ev.on(prefix+"remove:" + channel, function (data) {
 				model.emit("removed", data);
 			});
 
-			ev.on("queue:create" + channel, function (data) {
+			ev.on(prefix+"queue:create" + channel, function (data) {
 				model.emit("queue:create", data);
 			});
 
-			ev.on("queue:remove" + channel, function (data) {
+			ev.on(prefix+"queue:remove" + channel, function (data) {
 				model.emit("queue:remove", data);
 			});
 
-			ev.on("queue:update" + channel, function (data) {
+			ev.on(prefix+"queue:update" + channel, function (data) {
 				model.emit("queue:update", data);
 			});
 
@@ -198,19 +200,19 @@ function mongooseRedis(schema, options) {
 		var indexNew = newRecords.indexOf(doc._id);
 		if (indexNew > -1) {
 			newRecords.splice(indexNew, 1);
-			ev.pub("create:" + channel, doc);
+			ev.pub(prefix+"create:" + channel, doc);
 			if (queue.create) {
 				newJob(model.jobs, "create", channel, doc, function (err, job) {});
 			}
 		} else {
-			ev.pub("update:" + channel, doc);
+			ev.pub(prefix+"update:" + channel, doc);
 			if (queue.update) {
 				newJob(model.jobs, "update", channel, doc, function (err, job) {});
 			}
 		}
 	});
 	schema.post('remove', function (doc) {
-		ev.pub("remove:" + channel, doc);
+		ev.pub(prefix+"remove:" + channel, doc);
 		if (queue.remove) {
 			newJob(model.jobs, "remove", channel, doc, function (err, job) {});
 		}

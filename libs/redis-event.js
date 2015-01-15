@@ -85,17 +85,19 @@ RedisEvent.prototype._onMessage = function (channel, message) {
 
 RedisEvent.prototype.pub = function (eventName, payload) {
 	var split = eventName.split(':');
-	if (split.length != 2) {
+	if (split.length != 3) {
 		console.log("ev warning: eventName '%s' is incorrect", eventName);
 		return false;
 	}
 
 	var data = {
-		event: split[1],
+		prefix:split[0],
+		channel:split[1],
+		event: split[2],
 		payload: payload
 	};
 
-	this.pubRedis.publish(split[0], JSON.stringify(data), function () {});
+	this.pubRedis.publish(split[1], JSON.stringify(data), function () {});
 }
 
 RedisEvent.prototype.quit = function () {
