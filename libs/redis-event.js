@@ -74,7 +74,6 @@ RedisEvent.prototype.listChannels = function () {
 RedisEvent.prototype._onMessage = function (channel, message) {
 	var data = null,
 		eventName = null;
-	console.log(channel);
 	try {
 		data = JSON.parse(message);
 		if (data && data.event) {
@@ -83,6 +82,7 @@ RedisEvent.prototype._onMessage = function (channel, message) {
 	} catch (e) {}
 
 	if (data && eventName) {
+		console.log("debug",eventName,data.payload);
 		this.emit(eventName, data.payload);
 	}
 }

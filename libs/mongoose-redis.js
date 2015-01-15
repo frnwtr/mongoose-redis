@@ -73,7 +73,7 @@ function newJob(jobs,prefix, action, chan, doc, cb) {
 						error: err.message
 					});
 				} else {
-					ev.pub(prefix+"stats:queue", obj);
+					ev.pub(prefix+":stats:queue", obj);
 				}
 			});
 		cb(err, job);
