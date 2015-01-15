@@ -1,4 +1,3 @@
-var logger = require('winston');
 var _ = require('underscore');
 var async = require('async');
 var mongoose = require('mongoose');

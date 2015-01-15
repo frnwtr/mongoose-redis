@@ -29,7 +29,6 @@
     "kue": "^0.8.11",
     "mongoose": "^3.8.21",
     "redis": "^0.12.1",
-    "underscore": "^1.7.0",
-    "winston": "^0.8.3"
+    "underscore": "^1.7.0"
   }
 }
