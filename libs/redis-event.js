@@ -1,13 +1,13 @@
 var
 	util = require('util'),
 	events = require('events'),
-	redis = require('redis')
+	redis = require('redis');
 
-function RedisEvent(redisClient, prefix,channelsList) {
+function RedisEvent(redisClient, prefix, channelsList) {
 	events.EventEmitter.call(this);
 
 	var self = this;
-	this.prefix=prefix+":";
+	this.prefix = prefix + ":";
 
 	self._connectedCount = 0;
 
@@ -55,16 +55,14 @@ util.inherits(RedisEvent, events.EventEmitter);
 RedisEvent.prototype._subscribe = function () {
 	var self = this;
 	this.channelsList.forEach(function (channelName) {
-		self.subRedis.subscribe(self.prefix+channelName);
-		console.log(self.prefix+channelName);
+		self.subRedis.subscribe(self.prefix + channelName);
 	});
 }
 RedisEvent.prototype.addChannel = function (channelName) {
 	var self = this;
-	if (self.channelsList.indexOf(self.prefix+channelName) < 0) {
-		self.channelsList.push(self.prefix+channelName);
-		self.subRedis.subscribe(self.prefix+channelName);
-		console.log(self.prefix+channelName);
+	if (self.channelsList.indexOf(self.prefix + channelName) < 0) {
+		self.channelsList.push(self.prefix + channelName);
+		self.subRedis.subscribe(self.prefix + channelName);
 	};
 }
 RedisEvent.prototype.listChannels = function () {
@@ -82,7 +80,6 @@ RedisEvent.prototype._onMessage = function (channel, message) {
 	} catch (e) {}
 
 	if (data && eventName) {
-		console.log("debug",eventName,data.payload);
 		this.emit(eventName, data.payload);
 	}
 }
@@ -95,13 +92,13 @@ RedisEvent.prototype.pub = function (eventName, payload) {
 	}
 
 	var data = {
-		prefix:split[0],
-		channel:split[1],
+		prefix: split[0],
+		channel: split[1],
 		event: split[2],
 		payload: payload
 	};
 
-	this.pubRedis.publish(split[0]+":"+split[1], JSON.stringify(data), function () {});
+	this.pubRedis.publish(split[0] + ":" + split[1], JSON.stringify(data), function () {});
 }
 
 RedisEvent.prototype.quit = function () {
