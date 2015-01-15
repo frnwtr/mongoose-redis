@@ -152,11 +152,7 @@ function mongooseRedis(schema, options) {
 			/*	ev.on("stats:queue" + channel, function (data) {
 					model.emit("stats:queue", data);
 				});*/
-			if(redisClientKue){
-				model.jobs = kue.createQueue(redisClientKue);
-			}else{
-				model.jobs = kue.createQueue();
-			}
+			model.jobs = kue.createQueue(redisClientKue);
 
 			model.jobs.on('job enqueue', function (id, type) {
 				console.log('job %s got queued', id);
