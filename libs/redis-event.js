@@ -3,10 +3,11 @@ var
 	events = require('events'),
 	redis = require('redis')
 
-function RedisEvent(redisClient, channelsList) {
+function RedisEvent(redisClient, prefix,channelsList) {
 	events.EventEmitter.call(this);
 
 	var self = this;
+	this.prefix=prefix;
 
 	self._connectedCount = 0;
 

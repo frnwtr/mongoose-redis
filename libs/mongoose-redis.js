@@ -97,7 +97,7 @@ function mongooseRedis(schema, options) {
 	ev = new redisEvent({
 		pub: redisClientPub,
 		sub: redisClientSub
-	}, ['create', 'update', 'remove', 'queue', "stats"]);
+	},prefix, ['create', 'update', 'remove', 'queue', "stats"]);
 	var model = null;
 	schema.queue('hook', ['construct', function () {}]);
 	schema.queue('construct', []);
