@@ -91,6 +91,10 @@ function mongooseRedis(schema, options) {
 		var redisClientSub = redis.createClient('localhost', 6379);
 		var redisClientKue = redis.createClient('localhost', 6379);
 	}
+	var queueName="q";
+	if(options.queueName) {
+		queueName=options.queueName;
+	}
 	ev = new redisEvent({
 		pub: redisClientPub,
 		sub: redisClientSub
@@ -152,6 +156,7 @@ function mongooseRedis(schema, options) {
 					model.emit("stats:queue", data);
 				});*/
 			model.jobs = kue.createQueue({
+				prefix:queueName,
 				redis: {
 					createClientFactory: function () {
 						return redisClientKue;
