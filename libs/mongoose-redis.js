@@ -6,6 +6,7 @@ var redisEvent = require('./redis-event');
 var util = require('util');
 var events = require('events');
 var redis = require('redis');
+var Schema = require('mongoose').Schema;
 
 var ev = {};
 
@@ -84,7 +85,7 @@ function mongooseRedis(schema, options) {
 	events.EventEmitter.call(this);
 	var redisClientKue = null;
 	var prefix = "q";
-	var softDelete=true;
+	var softDelete = false;
 	if (options.redisClient) {
 		var redisClientPub = options.redisClient.pub;
 		var redisClientSub = options.redisClient.sub;
@@ -94,14 +95,14 @@ function mongooseRedis(schema, options) {
 		var redisClientPub = redis.createClient('localhost', 6379);
 		var redisClientSub = redis.createClient('localhost', 6379);
 	}
-	if(options.softDelete){
-		var softDelete=options.softDelete;
+	if (options.softDelete) {
+		var softDelete = options.softDelete;
 	}
 
 	ev = new redisEvent({
 		pub: redisClientPub,
 		sub: redisClientSub
-	}, prefix, ['create', 'update', 'remove', 'queue', 'stats','delete','restore']);
+	}, prefix, ['create', 'update', 'remove', 'queue', 'stats', 'delete', 'restore']);
 	var model = null;
 	schema.queue('hook', ['construct', function () {}]);
 	schema.queue('construct', []);
@@ -113,8 +114,8 @@ function mongooseRedis(schema, options) {
 	var channel = null;
 	var self = this;
 	var newRecords = [],
-		delettingRecords=[],
-		restoringRecords=[];
+		delettingRecords = [],
+		restoringRecords = [];
 	var queue = {
 		create: false,
 		remove: false,
@@ -159,7 +160,7 @@ function mongooseRedis(schema, options) {
 				model.emit("queue:update", data);
 			});
 
-			if(softDelete){
+			if (softDelete) {
 				ev.on(prefix + ":delete:" + channel, function (data) {
 					model.emit("deleted", data);
 				});
@@ -210,19 +211,26 @@ function mongooseRedis(schema, options) {
 			};
 			model.emit("init", channel);
 		}
-
 		next();
 	});
 
-	if(softDelete){
-		schema.add({ deleted: Boolean });
+	if (softDelete) {
+		schema.add({
+			deleted: Boolean
+		});
 
-		if (options && options.deletion.deletedAt === true) {
-			schema.add({ deletedAt: { type: Date} });
+		if (softDelete.deletedAt === true) {
+			schema.add({
+				deletedAt: {
+					type: Date
+				}
+			});
 		}
 
-		if (options && options.deletion.deletedAt === true) {
-			schema.add({ deletedBy: Schema.Types.ObjectId });
+		if (softDelete.deletedAt === true) {
+			schema.add({
+				deletedBy: Schema.Types.ObjectId
+			});
 		}
 
 		schema.pre('save', function (next) {
@@ -280,21 +288,21 @@ function mongooseRedis(schema, options) {
 			}
 		} else {
 			var indexDelete = delettingRecords.indexOf(doc._id);
-			if(indexDelete > -1){
+			if (indexDelete > -1) {
 				delettingRecords.splice(indexDelete, 1);
 				ev.pub(prefix + ":delete:" + channel, doc);
 				if (queue.create) {
 					newJob(model.jobs, prefix, "delete", channel, doc, function (err, job) {});
 				}
-			}else{
+			} else {
 				var indexRestore = restoringRecords.indexOf(doc._id);
-				if(indexRestore > -1){
+				if (indexRestore > -1) {
 					restoringRecords.splice(indexRestore, 1);
 					ev.pub(prefix + ":restore:" + channel, doc);
 					if (queue.create) {
 						newJob(model.jobs, prefix, "restore", channel, doc, function (err, job) {});
 					}
-				}else{
+				} else {
 					ev.pub(prefix + ":update:" + channel, doc);
 					if (queue.update) {
 						newJob(model.jobs, prefix, "update", channel, doc, function (err, job) {});
