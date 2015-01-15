@@ -83,12 +83,12 @@ function newJob(jobs,prefix, action, chan, doc, cb) {
 function mongooseRedis(schema, options) {
 	events.EventEmitter.call(this);
 	var redisClientKue=null;
-	var prefix="q:";
+	var prefix="q";
 	if (options.redisClient) {
 		var redisClientPub = options.redisClient.pub;
 		var redisClientSub = options.redisClient.sub;
 		redisClientKue = options.redisClient.kue;
-		prefix=options.redisClient.kue.prefix+":";
+		prefix=options.redisClient.kue.prefix;
 	} else {
 		var redisClientPub = redis.createClient('localhost', 6379);
 		var redisClientSub = redis.createClient('localhost', 6379);
@@ -98,6 +98,7 @@ function mongooseRedis(schema, options) {
 		pub: redisClientPub,
 		sub: redisClientSub
 	},prefix, ['create', 'update', 'remove', 'queue', "stats"]);
+	prefix+=":";
 	var model = null;
 	schema.queue('hook', ['construct', function () {}]);
 	schema.queue('construct', []);
