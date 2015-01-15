@@ -7,7 +7,7 @@ function RedisEvent(redisClient, prefix,channelsList) {
 	events.EventEmitter.call(this);
 
 	var self = this;
-	this.prefix=prefix;
+	this.prefix=prefix+":";
 
 	self._connectedCount = 0;
 
@@ -64,6 +64,7 @@ RedisEvent.prototype.addChannel = function (channelName) {
 	if (self.channelsList.indexOf(self.prefix+channelName) < 0) {
 		self.channelsList.push(self.prefix+channelName);
 		self.subRedis.subscribe(self.prefix+channelName);
+		console.log(self.prefix+channelName);
 	};
 }
 RedisEvent.prototype.listChannels = function () {
