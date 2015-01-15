@@ -82,19 +82,16 @@ function newJob(jobs, action, chan, doc, cb) {
 
 function mongooseRedis(schema, options) {
 	events.EventEmitter.call(this);
+	var redisClientKue=null;
 	if (options.redisClient) {
 		var redisClientPub = options.redisClient.pub;
 		var redisClientSub = options.redisClient.sub;
-		var redisClientKue = options.redisClient.kue;
+		redisClientKue = options.redisClient.kue;
 	} else {
 		var redisClientPub = redis.createClient('localhost', 6379);
 		var redisClientSub = redis.createClient('localhost', 6379);
-		var redisClientKue = redis.createClient('localhost', 6379);
 	}
-	var queueName="q";
-	if(options.queueName) {
-		queueName=options.queueName;
-	}
+
 	ev = new redisEvent({
 		pub: redisClientPub,
 		sub: redisClientSub
@@ -155,6 +152,11 @@ function mongooseRedis(schema, options) {
 			/*	ev.on("stats:queue" + channel, function (data) {
 					model.emit("stats:queue", data);
 				});*/
+			if(redisClientKue){
+				model.jobs = kue.createQueue(redisClientKue);
+			}else{
+				model.jobs = kue.createQueue();
+			}
 			model.jobs = kue.createQueue({
 				prefix:queueName,
 				redis: {
