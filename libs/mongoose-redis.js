@@ -157,14 +157,7 @@ function mongooseRedis(schema, options) {
 			}else{
 				model.jobs = kue.createQueue();
 			}
-			model.jobs = kue.createQueue({
-				prefix:queueName,
-				redis: {
-					createClientFactory: function () {
-						return redisClientKue;
-					}
-				}
-			});
+
 			model.jobs.on('job enqueue', function (id, type) {
 				console.log('job %s got queued', id);
 			});
