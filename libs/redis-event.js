@@ -55,14 +55,14 @@ util.inherits(RedisEvent, events.EventEmitter);
 RedisEvent.prototype._subscribe = function () {
 	var self = this;
 	this.channelsList.forEach(function (channelName) {
-		self.subRedis.subscribe(channelName);
+		self.subRedis.subscribe(self.prefix+channelName);
 	});
 }
 RedisEvent.prototype.addChannel = function (channelName) {
 	var self = this;
-	if (self.channelsList.indexOf(channelName) < 0) {
-		self.channelsList.push(channelName);
-		self.subRedis.subscribe(channelName);
+	if (self.channelsList.indexOf(self.prefix+channelName) < 0) {
+		self.channelsList.push(self.prefix+channelName);
+		self.subRedis.subscribe(self.prefix+channelName);
 	};
 }
 RedisEvent.prototype.listChannels = function () {
