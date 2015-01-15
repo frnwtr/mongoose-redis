@@ -98,7 +98,7 @@ RedisEvent.prototype.pub = function (eventName, payload) {
 		payload: payload
 	};
 
-	this.pubRedis.publish(split[1], JSON.stringify(data), function () {});
+	this.pubRedis.publish(split[0]+":"+split[1], JSON.stringify(data), function () {});
 }
 
 RedisEvent.prototype.quit = function () {
