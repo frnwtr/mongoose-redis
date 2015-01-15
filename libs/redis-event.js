@@ -56,6 +56,7 @@ RedisEvent.prototype._subscribe = function () {
 	var self = this;
 	this.channelsList.forEach(function (channelName) {
 		self.subRedis.subscribe(self.prefix+channelName);
+		console.log(self.prefix+channelName);
 	});
 }
 RedisEvent.prototype.addChannel = function (channelName) {
